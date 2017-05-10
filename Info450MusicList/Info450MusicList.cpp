@@ -1,8 +1,4 @@
-// Info450MusicList.cpp : Defines the entry point for the console application.
-//
-
-
-#include "stdafx.h"
+/#include "stdafx.h"
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -10,14 +6,14 @@ using namespace std;
 
 const int READERROR = 100;
 const int WRITEERROR = 200;
-// list Node Class
+
 class node
 {
 	string data;
 	node *next;
 public:
 	node(string x);
-	friend class linkedList;
+	friend class linkList;
 };
 
 node::node(string x)
@@ -26,30 +22,30 @@ node::node(string x)
 	next = NULL;
 }
 
-// Linked List Class
-class linkedList
+
+class linkList
 {
 	node *head;
 	node *tail;
 public:
-	linkedList();
-	int ReadMusicList(string filename);
-	int SaveMusicList(string filename);
-	void addNodeToEnd(node *nptr);
-	void addNodeToHead(node *nptr);
-	int insertAfter(node *ptr, string i);
-	int removeNode(string i);
-	void showList();
-	node * findItem(string i);
+	linkList();
+	int ReadInList(string filename);
+	int SaveList(string filename);
+	void addEndNode(node *nptr);
+	void addHeadNode(node *nptr);
+	int insertAfterSong(node *ptr, string i);
+	int nodeRemoval(string i);
+	void showMusicList();
+	node * findSong(string i);
 };
 
-linkedList::linkedList()
+linkList::linkList()
 {
 	head = NULL;
 	tail = NULL;
 }
 
-int linkedList::ReadMusicList(string filename)
+int linkList::ReadInList(string filename)
 {
 	int count = 0;
 	string sname;
@@ -71,7 +67,7 @@ int linkedList::ReadMusicList(string filename)
 				count++;
 			}
 
-			addNodeToEnd(new node(sname));
+			addEndNode(new node(sname));
 			count++;
 		}
 	}
@@ -79,7 +75,7 @@ int linkedList::ReadMusicList(string filename)
 	return 0;
 }
 
-int linkedList::SaveMusicList(string filename)
+int linkList::SaveList(string filename)
 {
 	ofstream output(filename, ios::trunc);
 	if (!output)
@@ -101,7 +97,7 @@ int linkedList::SaveMusicList(string filename)
 	return 0;
 }
 
-void linkedList::showList()
+void linkList::showMusicList()
 {
 	node *ptr;
 	ptr = head;
@@ -114,19 +110,19 @@ void linkedList::showList()
 
 	while (ptr != NULL)
 	{
-		cout << "Next up! " << ptr->data << endl;
-		cout << "(P)lay, (S)kip, (A)dd, (D)elete, (Q)uit" << endl;
+		cout << "Next Song " << ptr->data << endl;
+		cout << "Press P for play, S for skip, A for add song, D to delete song, Q to quit song" << endl;
 		cin >> answer;
 		if (answer == 'p' || answer == 'P')
 		{
-			cout << "Now Playing: " << ptr->data << endl;
+			cout << "Current Song: " << ptr->data << endl;
 			ptr = ptr->next;
 
 		}
 		else if (answer == 's' || answer == 'S')
 		{
 			int skipNumber;
-			cout << "Skip how many songs?" << endl;
+			cout << "How many songs would you like to skip" << endl;
 			cin >> skipNumber;
 			for (int i = 0; i < skipNumber; i++)
 			{
@@ -134,7 +130,7 @@ void linkedList::showList()
 				{
 					ptr = head;
 				}
-				cout << "Skipping: " << ptr->data << endl;
+				cout << "Skipping song " << ptr->data << endl;
 				ptr = ptr->next;
 
 
@@ -146,17 +142,17 @@ void linkedList::showList()
 			cin.ignore();
 			cin.clear();
 			string songTitle;
-			cout << "What is the name of your new song?" << endl;
+			cout << "What is the name of ths song you would like to add" << endl;
 			getline(cin, songTitle);
-			insertAfter(new node(songTitle), ptr->data);
-			cout << "Song Added!" << endl;
+			insertAfterSong(new node(songTitle), ptr->data);
+			cout << "Your new song has been added" << endl;
 		}
 
 		else if (answer == 'd' || answer == 'D')
 		{
 			string deletenode = ptr->data;
 			ptr = ptr->next;
-			removeNode(deletenode);
+			nodeRemoval(deletenode);
 
 
 		}
@@ -168,13 +164,13 @@ void linkedList::showList()
 	if (ptr == NULL)
 	{
 		ptr = head;
-		showList();
+		showMusicList();
 	}
 }
 
-void linkedList::addNodeToEnd(node *ptr)
+void linkList::addEndNode(node *ptr)
 {
-	// if list is empty
+
 	if (head == NULL)
 	{
 		head = ptr;
@@ -187,7 +183,7 @@ void linkedList::addNodeToEnd(node *ptr)
 	}
 }
 
-void linkedList::addNodeToHead(node *ptr)
+void linkList::addHeadNode(node *ptr)
 {
 	if (head == NULL)
 	{
@@ -201,16 +197,16 @@ void linkedList::addNodeToHead(node *ptr)
 	}
 }
 
-int linkedList::insertAfter(node *newnode, string i)
+int linkList::insertAfterSong(node *newnode, string i)
 {
 	node *ptr = head;
 	while (ptr != NULL)
 	{
-		if (ptr->data == i) // we found the node to insert after
+		if (ptr->data == i) 
 		{
 			newnode->next = ptr->next;
 			ptr->next = newnode;
-			if (tail == ptr) // repoint tail if we added to end
+			if (tail == ptr) 
 				tail = newnode;
 			return 0;
 		}
@@ -219,7 +215,7 @@ int linkedList::insertAfter(node *newnode, string i)
 	return -1;
 }
 
-node * linkedList::findItem(string i)
+node * linkList::findSong(string i)
 {
 	node *ptr;
 	ptr = head;
@@ -227,27 +223,27 @@ node * linkedList::findItem(string i)
 	{
 		if (ptr->data == i)
 		{
-			cout << "found it!" << endl;
+			cout << "we found the song you were looking for" << endl;
 			return ptr;
 		}
 		ptr = ptr->next;
 	}
 
-	cout << "Not found" << endl;
+	cout << "Unable to find the song you were looking for" << endl;
 	return NULL;
 }
 
 
-int linkedList::removeNode(string i)
+int linkList::nodeRemoval(string i)
 {
 	node *ptr = head;
-	if (ptr == NULL)  // empty list
+	if (ptr == NULL)  
 		return -1;
 
-	// if node is at the head
+	
 	if (head->data == i)
 	{
-		//if only 1 node in the list
+		
 		if (head == tail)
 		{
 			head = NULL;
@@ -278,12 +274,13 @@ int linkedList::removeNode(string i)
 int main()
 {
 	string musicFile;
-	linkedList *mylist = new linkedList();
-	cout << "What is the file path to your music?" << endl;
+	linkList *mylist = new linkList();
+	cout << "What is the file location of your music playlist?" << endl;
 	getline(cin, musicFile);
-	mylist->ReadMusicList(musicFile);
-	mylist->showList();
-	mylist->SaveMusicList(musicFile);
+	mylist->ReadInList(musicFile);
+	mylist->showMusicList();
+	mylist->SaveList(musicFile);
 
 	return 0;
 }
+
